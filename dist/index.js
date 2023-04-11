@@ -34,8 +34,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(require("path"));
 const htmlChangeDetector_1 = require("./htmlChangeDetector");
+const logger_1 = require("./logger");
 (() => __awaiter(void 0, void 0, void 0, function* () {
+    const base = process.env.PR_BASE_REF;
     const token = process.env.SLACK_BOT_TOKEN;
+    (0, logger_1.logWithColor)(`PR_BASE_REF: ${base}`, 'green');
+    (0, logger_1.logWithColor)(`SLACK_BOT_TOKEN: ${token}`, 'green');
     const detector = new htmlChangeDetector_1.HtmlChangeDetector(token);
     const diffFilePath = path.join(__dirname, 'diff.txt');
     const slackChannel = '#your-slack-channel';
