@@ -1,0 +1,15 @@
+# Node.js dependencies
+node_modules/
+
+# TypeScript build output
+dist/
+
+# Temporary files
+*.tmp
+*.swp
+*.log
+
+# IDE files
+.vscode/
+*.iml
+.idea/
