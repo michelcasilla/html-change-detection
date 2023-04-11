@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { WebClient } from '@slack/web-api';
+import { logWithColor } from './logger';
 
 export class HtmlChangeDetector {
   private webClient: WebClient;
@@ -42,8 +43,11 @@ export class HtmlChangeDetector {
 
   public async processDiffFile(filePath: string, slackChannel: string): Promise<void> {
     const diffText = this.readDiffFile(filePath);
+    logWithColor(diffText, 'green');
     const matches = this.detectChanges(diffText);
+    logWithColor(matches, 'green');
     const message = this.createMessage(matches);
+    logWithColor(message, 'green');
     await this.sendMessageToSlack(slackChannel, message);
   }
 }

@@ -35,6 +35,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HtmlChangeDetector = void 0;
 const fs = __importStar(require("fs"));
 const web_api_1 = require("@slack/web-api");
+const logger_1 = require("./logger");
 class HtmlChangeDetector {
     constructor(token) {
         this.pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
@@ -71,8 +72,11 @@ class HtmlChangeDetector {
     processDiffFile(filePath, slackChannel) {
         return __awaiter(this, void 0, void 0, function* () {
             const diffText = this.readDiffFile(filePath);
+            (0, logger_1.logWithColor)(diffText, 'green');
             const matches = this.detectChanges(diffText);
+            (0, logger_1.logWithColor)(matches, 'green');
             const message = this.createMessage(matches);
+            (0, logger_1.logWithColor)(message, 'green');
             yield this.sendMessageToSlack(slackChannel, message);
         });
     }
