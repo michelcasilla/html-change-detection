@@ -2,7 +2,7 @@
   "name": "html-change-detection",
   "version": "1.0.0",
   "description": "",
-  "main": "detect_changes.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/detect_changes.ts"
