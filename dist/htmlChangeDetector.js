@@ -45,14 +45,20 @@ class HtmlChangeDetector {
         return fs.readFileSync(filePath, 'utf-8');
     }
     detectChanges(diffText) {
-        return diffText.match(this.pattern);
+        const matches = diffText.match(this.pattern);
+        const matchedCleanedList = [...new Set(matches)].map(x => x.replace(/\t/gi, '').trim());
+        return matchedCleanedList;
     }
     createMessage(matches) {
         if (!matches) {
             return 'No HTML changes detected';
         }
-        let message = 'HTML changes detected:\n';
-        message += matches.map(x => x.trim()).join('\n\r');
+        let message = 'HTML changes detected:\n\r';
+        // remove duplicates 
+        // remove enter
+        // trim side values
+        // and join with and enter
+        message += matches.join('\n\r');
         return message;
     }
     sendMessageToSlack(channel, message) {
@@ -62,7 +68,6 @@ class HtmlChangeDetector {
                     channel,
                     text: message,
                 });
-                console.log('Message sent to Slack');
             }
             catch (error) {
                 console.error('Error trying to send message to Slack:', error);
@@ -72,9 +77,7 @@ class HtmlChangeDetector {
     processDiffFile(filePath, slackChannel) {
         return __awaiter(this, void 0, void 0, function* () {
             const diffText = this.readDiffFile(filePath);
-            (0, logger_1.logWithColor)(diffText, 'green');
             const matches = this.detectChanges(diffText);
-            (0, logger_1.logWithColor)(matches, 'green');
             const message = this.createMessage(matches);
             (0, logger_1.logWithColor)(message, 'green');
             yield this.sendMessageToSlack(slackChannel, message);

@@ -16,7 +16,9 @@ export class HtmlChangeDetector {
   }
 
   private detectChanges(diffText: string): string[] | null {
-    return diffText.match(this.pattern);
+    const matches = diffText.match(this.pattern);
+    const matchedCleanedList = [...new Set(matches)].map(x => x.replace(/\t/gi, '').trim());
+    return matchedCleanedList;
   }
 
   private createMessage(matches: string[] | null): string {
@@ -24,8 +26,12 @@ export class HtmlChangeDetector {
       return 'No HTML changes detected';
     }
 
-    let message = 'HTML changes detected:\n';
-    message += matches.map(x => x.trim()).join('\n\r');
+    let message = 'HTML changes detected:\n\r';
+    // remove duplicates 
+    // remove enter
+    // trim side values
+    // and join with and enter
+    message += matches.join('\n\r');
     return message;
   }
 
@@ -35,7 +41,6 @@ export class HtmlChangeDetector {
         channel,
         text: message,
       });
-      console.log('Message sent to Slack');
     } catch (error) {
       console.error('Error trying to send message to Slack:', error);
     }
@@ -43,9 +48,7 @@ export class HtmlChangeDetector {
 
   public async processDiffFile(filePath: string, slackChannel: string): Promise<void> {
     const diffText = this.readDiffFile(filePath);
-    logWithColor(diffText, 'green');
     const matches = this.detectChanges(diffText);
-    logWithColor(matches, 'green');
     const message = this.createMessage(matches);
     logWithColor(message, 'green');
     await this.sendMessageToSlack(slackChannel, message);
