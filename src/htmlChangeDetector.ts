@@ -17,9 +17,17 @@ export class HtmlChangeDetector {
 
   private detectChanges(diffText: string): string[] | null {
     const matches = diffText.match(this.pattern);
-    const matchedCleanedList = [...new Set(matches)].map(x => x.replace(/\t/gi, '').trim());
+    
+    if (!matches) {
+      return null;
+    }
+  
+    const uniqueMatches = new Set(matches.map(x => x.replace(/\t/gi, '').trim()));
+    const matchedCleanedList = Array.from(uniqueMatches);
+  
     return matchedCleanedList;
   }
+  
 
   private createMessage(matches: string[] | null): string {
     if (!matches) {

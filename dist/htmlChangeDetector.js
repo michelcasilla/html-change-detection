@@ -46,7 +46,11 @@ class HtmlChangeDetector {
     }
     detectChanges(diffText) {
         const matches = diffText.match(this.pattern);
-        const matchedCleanedList = [...new Set(matches)].map(x => x.replace(/\t/gi, '').trim());
+        if (!matches) {
+            return null;
+        }
+        const uniqueMatches = new Set(matches.map(x => x.replace(/\t/gi, '').trim()));
+        const matchedCleanedList = Array.from(uniqueMatches);
         return matchedCleanedList;
     }
     createMessage(matches) {
