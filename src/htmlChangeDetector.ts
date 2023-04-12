@@ -10,9 +10,11 @@ export class HtmlChangeDetector {
   private pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
   private notifier;
   private baseBranch;
-  constructor(token: string, slackChannel: string, base?: string, committedBy?: string) {
+  private branchUrl;
+  constructor(token: string, slackChannel: string, base?: string, committedBy?: string, branchUrl?: string) {
     // this.webClient = new WebClient(token);
     this.baseBranch = base;
+    this.branchUrl = branchUrl;
     this.notifier = new SlackNotification(token, slackChannel, committedBy);
   }
 

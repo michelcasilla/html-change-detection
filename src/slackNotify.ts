@@ -12,10 +12,10 @@ export class SlackNotification{
 		this.slack = SlackNotify(this.hook_url);
 	}
 
-	async send(params = {text: '', branch: '', avatar: '', changes: [], channelConf : { unfUrlLinks: 1}}){
+	async send(params = {text: '', branch: '', branchUrl: '', avatar: '', changes: [], channelConf : { unfUrlLinks: 1}}){
 		const attachments = [
 			{
-				"pretext": `PullRequest ${params.branch} from ${this.username} may have impact on Auto_Testing`,
+				"pretext": `Pull request ${params.branchUrl} from https://github.com/${this.username} may have impact on Auto_Testing`,
 				"title": `${this.username} - ${params.branch}`,
 				"fields": params.changes.map(change => {
 					return {

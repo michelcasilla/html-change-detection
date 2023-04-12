@@ -21,12 +21,12 @@ class SlackNotification {
         this.username = username || 'GitHubAction';
         this.slack = (0, slack_notify_1.default)(this.hook_url);
     }
-    send(params = { text: '', branch: '', avatar: '', changes: [], channelConf: { unfUrlLinks: 1 } }) {
+    send(params = { text: '', branch: '', branchUrl: '', avatar: '', changes: [], channelConf: { unfUrlLinks: 1 } }) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const attachments = [
                 {
-                    "pretext": `PullRequest ${params.branch} from ${this.username} may have impact on Auto_Testing`,
+                    "pretext": `Pull request ${params.branchUrl} from https://github.com/${this.username} may have impact on Auto_Testing`,
                     "title": `${this.username} - ${params.branch}`,
                     "fields": params.changes.map(change => {
                         return {
