@@ -6,14 +6,13 @@ import { validateEnv } from './validate';
 (async () => {
 
   validateEnv([
-    'PR_BASE_REF',
+    'SLACK_CHANNEL',
     'SLACK_BOT_TOKEN'
   ]);
-  
+
   const base = process.env.PR_BASE_REF;
   const token = process.env.SLACK_BOT_TOKEN;
   const slackChannel = process.env.SLACK_CHANNEL;
-
 
   // const atPath = process.env.AUTOMATE_TESTING_REPO_PATH;
   // logWithColor(`PR_BASE_REF: ${base}`, 'green');

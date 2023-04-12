@@ -37,7 +37,7 @@ const htmlChangeDetector_1 = require("./htmlChangeDetector");
 const validate_1 = require("./validate");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     (0, validate_1.validateEnv)([
-        'PR_BASE_REF',
+        'SLACK_CHANNEL',
         'SLACK_BOT_TOKEN'
     ]);
     const base = process.env.PR_BASE_REF;
