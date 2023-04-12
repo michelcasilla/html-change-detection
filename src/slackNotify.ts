@@ -31,7 +31,7 @@ export class SlackNotification{
 		
 		const channel = `#${this.channel}`;
 		const username = this.username || 'GitHubAction';
-		const unfurl_links = params.channelConf.unfUrlLinks;
+		const unfurl_links = params?.channelConf?.unfUrlLinks || 1;
 		return await this.slack.send({ 
 			channel, 
 			avatar, 

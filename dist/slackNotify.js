@@ -22,6 +22,7 @@ class SlackNotification {
         this.slack = (0, slack_notify_1.default)(this.hook_url);
     }
     send(params = { text: '', branch: '', committedBy: '', avatar: '', changes: [], channelConf: { unfUrlLinks: 1 } }) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const attachments = [
                 {
@@ -40,7 +41,7 @@ class SlackNotification {
             const { text, avatar } = params;
             const channel = `#${this.channel}`;
             const username = this.username || 'GitHubAction';
-            const unfurl_links = params.channelConf.unfUrlLinks;
+            const unfurl_links = ((_a = params === null || params === void 0 ? void 0 : params.channelConf) === null || _a === void 0 ? void 0 : _a.unfUrlLinks) || 1;
             return yield this.slack.send({
                 channel,
                 avatar,
