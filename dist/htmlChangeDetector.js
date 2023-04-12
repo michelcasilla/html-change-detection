@@ -52,7 +52,7 @@ class HtmlChangeDetector {
         if (!matches) {
             return null;
         }
-        const uniqueMatches = new Set(matches.map(x => x.replace(/\t/gi, '').trim()));
+        const uniqueMatches = new Set(matches);
         const matchedCleanedList = Array.from(uniqueMatches);
         return matchedCleanedList;
     }
