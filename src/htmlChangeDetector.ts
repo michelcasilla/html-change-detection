@@ -25,7 +25,7 @@ export class HtmlChangeDetector {
     }
 
     let message = 'HTML changes detected:\n';
-    message += matches.join('\n');
+    message += matches.map(x => x.trim()).join('\n\r');
     return message;
   }
 
