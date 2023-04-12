@@ -17,7 +17,7 @@ import { validateEnv } from './validate';
   // const atPath = process.env.AUTOMATE_TESTING_REPO_PATH;
   // logWithColor(`PR_BASE_REF: ${base}`, 'green');
   // logWithColor(`SLACK_BOT_TOKEN: ${token}`, 'green');
-  const detector = new HtmlChangeDetector(token!);
+  const detector = new HtmlChangeDetector(token, slackChannel);
   const diffFilePath = path.join(__dirname, 'diff.txt');
   await detector.processDiffFile(diffFilePath, slackChannel);
 

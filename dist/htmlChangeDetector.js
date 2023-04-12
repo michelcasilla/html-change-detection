@@ -34,12 +34,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HtmlChangeDetector = void 0;
 const fs = __importStar(require("fs"));
-const web_api_1 = require("@slack/web-api");
 const logger_1 = require("./logger");
+const slackNotify_1 = require("./slackNotify");
 class HtmlChangeDetector {
-    constructor(token) {
+    constructor(token, slackChannel, base) {
         this.pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
-        this.webClient = new web_api_1.WebClient(token);
+        // this.webClient = new WebClient(token);
+        this.baseBranch = base;
+        this.notifier = new slackNotify_1.SlackNotification(token, slackChannel);
     }
     readDiffFile(filePath) {
         return fs.readFileSync(filePath, 'utf-8');
@@ -65,13 +67,20 @@ class HtmlChangeDetector {
         message += matches.join('\n\r');
         return message;
     }
-    sendMessageToSlack(channel, message) {
+    sendMessageToSlack(channel, message, changes = []) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield this.webClient.chat.postMessage({
-                    channel,
+                this.notifier.send({
                     text: message,
+                    branch: this.baseBranch,
+                    committedBy: 'Michel Casilla',
+                    avatar: '',
+                    changes
                 });
+                // await this.webClient.chat.postMessage({
+                //   channel,
+                //   text: message,
+                // });
             }
             catch (error) {
                 console.error('Error trying to send message to Slack:', error);
@@ -84,7 +93,7 @@ class HtmlChangeDetector {
             const matches = this.detectChanges(diffText);
             const message = this.createMessage(matches);
             (0, logger_1.logWithColor)(message, 'green');
-            yield this.sendMessageToSlack(slackChannel, message);
+            yield this.sendMessageToSlack(slackChannel, message, matches);
         });
     }
 }

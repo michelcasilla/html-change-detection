@@ -2,13 +2,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { WebClient } from '@slack/web-api';
 import { logWithColor } from './logger';
+import { SlackNotification } from './slackNotify';
+import { text } from 'stream/consumers';
 
 export class HtmlChangeDetector {
   private webClient: WebClient;
   private pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
-
-  constructor(token: string) {
-    this.webClient = new WebClient(token);
+  private notifier;
+  private baseBranch;
+  constructor(token: string, slackChannel: string, base?: string) {
+    // this.webClient = new WebClient(token);
+    this.baseBranch = base;
+    this.notifier = new SlackNotification(token, slackChannel);
   }
 
   private readDiffFile(filePath: string): string {
@@ -43,12 +48,19 @@ export class HtmlChangeDetector {
     return message;
   }
 
-  public async sendMessageToSlack(channel: string, message: string): Promise<void> {
+  public async sendMessageToSlack(channel: string, message: string, changes = []): Promise<void> {
     try {
-      await this.webClient.chat.postMessage({
-        channel,
+      this.notifier.send({
         text: message,
-      });
+        branch: this.baseBranch,
+        committedBy: 'Michel Casilla',
+        avatar: '',
+        changes
+      })
+      // await this.webClient.chat.postMessage({
+      //   channel,
+      //   text: message,
+      // });
     } catch (error) {
       console.error('Error trying to send message to Slack:', error);
     }
@@ -59,6 +71,6 @@ export class HtmlChangeDetector {
     const matches = this.detectChanges(diffText);
     const message = this.createMessage(matches);
     logWithColor(message, 'green');
-    await this.sendMessageToSlack(slackChannel, message);
+    await this.sendMessageToSlack(slackChannel, message, matches);
   }
 }

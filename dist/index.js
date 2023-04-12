@@ -46,7 +46,7 @@ const validate_1 = require("./validate");
     // const atPath = process.env.AUTOMATE_TESTING_REPO_PATH;
     // logWithColor(`PR_BASE_REF: ${base}`, 'green');
     // logWithColor(`SLACK_BOT_TOKEN: ${token}`, 'green');
-    const detector = new htmlChangeDetector_1.HtmlChangeDetector(token);
+    const detector = new htmlChangeDetector_1.HtmlChangeDetector(token, slackChannel);
     const diffFilePath = path.join(__dirname, 'diff.txt');
     yield detector.processDiffFile(diffFilePath, slackChannel);
 }))();
