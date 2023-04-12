@@ -70,17 +70,13 @@ class HtmlChangeDetector {
     sendMessageToSlack(channel, message, changes = []) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                this.notifier.send({
+                yield this.notifier.send({
                     text: message,
                     branch: this.baseBranch,
                     committedBy: 'Michel Casilla',
                     avatar: '',
                     changes
                 });
-                // await this.webClient.chat.postMessage({
-                //   channel,
-                //   text: message,
-                // });
             }
             catch (error) {
                 console.error('Error trying to send message to Slack:', error);

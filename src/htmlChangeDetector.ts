@@ -50,17 +50,13 @@ export class HtmlChangeDetector {
 
   public async sendMessageToSlack(channel: string, message: string, changes = []): Promise<void> {
     try {
-      this.notifier.send({
+      await this.notifier.send({
         text: message,
         branch: this.baseBranch,
         committedBy: 'Michel Casilla',
         avatar: '',
         changes
-      })
-      // await this.webClient.chat.postMessage({
-      //   channel,
-      //   text: message,
-      // });
+      });
     } catch (error) {
       console.error('Error trying to send message to Slack:', error);
     }
