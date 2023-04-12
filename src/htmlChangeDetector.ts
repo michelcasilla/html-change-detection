@@ -49,6 +49,7 @@ export class HtmlChangeDetector {
       await this.notifier.send({
         text: message,
         branch: this.baseBranch,
+        branchUrl: this.branchUrl,
         avatar: '',
         changes
       });
