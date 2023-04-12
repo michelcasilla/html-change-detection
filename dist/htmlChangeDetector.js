@@ -37,11 +37,11 @@ const fs = __importStar(require("fs"));
 const logger_1 = require("./logger");
 const slackNotify_1 = require("./slackNotify");
 class HtmlChangeDetector {
-    constructor(token, slackChannel, base) {
+    constructor(token, slackChannel, base, committedBy) {
         this.pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
         // this.webClient = new WebClient(token);
         this.baseBranch = base;
-        this.notifier = new slackNotify_1.SlackNotification(token, slackChannel);
+        this.notifier = new slackNotify_1.SlackNotification(token, slackChannel, committedBy);
     }
     readDiffFile(filePath) {
         return fs.readFileSync(filePath, 'utf-8');
@@ -56,24 +56,18 @@ class HtmlChangeDetector {
         return matchedCleanedList;
     }
     createMessage(matches) {
+        let message = 'HTML changes detected';
         if (!matches) {
-            return 'No HTML changes detected';
+            message = 'No HTML changes detected';
         }
-        let message = 'HTML changes detected:\n\r';
-        // remove duplicates 
-        // remove enter
-        // trim side values
-        // and join with and enter
-        message += matches.join('\n\r');
         return message;
     }
-    sendMessageToSlack(channel, message, changes = []) {
+    sendMessageToSlack(message, changes = []) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.notifier.send({
                     text: message,
                     branch: this.baseBranch,
-                    committedBy: 'Michel Casilla',
                     avatar: '',
                     changes
                 });
@@ -83,13 +77,14 @@ class HtmlChangeDetector {
             }
         });
     }
-    processDiffFile(filePath, slackChannel) {
+    processDiffFile(filePath) {
         return __awaiter(this, void 0, void 0, function* () {
             const diffText = this.readDiffFile(filePath);
             const matches = this.detectChanges(diffText);
             const message = this.createMessage(matches);
             (0, logger_1.logWithColor)(message, 'green');
-            yield this.sendMessageToSlack(slackChannel, message, matches);
+            (0, logger_1.logWithColor)(matches.join(' | '), 'green');
+            yield this.sendMessageToSlack(message, matches);
         });
     }
 }

@@ -18,16 +18,16 @@ class SlackNotification {
     constructor(hook_url, channel, username) {
         this.hook_url = hook_url;
         this.channel = channel;
-        this.username = username;
+        this.username = username || 'GitHubAction';
         this.slack = (0, slack_notify_1.default)(this.hook_url);
     }
-    send(params = { text: '', branch: '', committedBy: '', avatar: '', changes: [], channelConf: { unfUrlLinks: 1 } }) {
+    send(params = { text: '', branch: '', avatar: '', changes: [], channelConf: { unfUrlLinks: 1 } }) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const attachments = [
                 {
-                    "pretext": `PullRequest ${params.branch} from ${params.committedBy} may have impact on Auto_Testing`,
-                    "title": `${params.committedBy} - ${params.branch}`,
+                    "pretext": `PullRequest ${params.branch} from ${this.username} may have impact on Auto_Testing`,
+                    "title": `${this.username} - ${params.branch}`,
                     "fields": params.changes.map(change => {
                         return {
                             "Change": 'Attribute Changed',
@@ -40,7 +40,6 @@ class SlackNotification {
             ];
             const { text, avatar } = params;
             const channel = `#${this.channel}`;
-            const username = this.username || 'GitHubAction';
             const unfurl_links = ((_a = params === null || params === void 0 ? void 0 : params.channelConf) === null || _a === void 0 ? void 0 : _a.unfUrlLinks) || 1;
             return yield this.slack.send({
                 channel,
@@ -48,7 +47,7 @@ class SlackNotification {
                 attachments,
                 text,
                 unfurl_links,
-                username
+                username: this.username
             });
         });
     }

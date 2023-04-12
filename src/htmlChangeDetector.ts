@@ -10,10 +10,10 @@ export class HtmlChangeDetector {
   private pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
   private notifier;
   private baseBranch;
-  constructor(token: string, slackChannel: string, base?: string) {
+  constructor(token: string, slackChannel: string, base?: string, committedBy?: string) {
     // this.webClient = new WebClient(token);
     this.baseBranch = base;
-    this.notifier = new SlackNotification(token, slackChannel);
+    this.notifier = new SlackNotification(token, slackChannel, committedBy);
   }
 
   private readDiffFile(filePath: string): string {
@@ -35,25 +35,18 @@ export class HtmlChangeDetector {
   
 
   private createMessage(matches: string[] | null): string {
+    let message = 'HTML changes detected';
     if (!matches) {
-      return 'No HTML changes detected';
+      message = 'No HTML changes detected';
     }
-
-    let message = 'HTML changes detected:\n\r';
-    // remove duplicates 
-    // remove enter
-    // trim side values
-    // and join with and enter
-    message += matches.join('\n\r');
     return message;
   }
 
-  public async sendMessageToSlack(channel: string, message: string, changes = []): Promise<void> {
+  public async sendMessageToSlack(message: string, changes = []): Promise<void> {
     try {
       await this.notifier.send({
         text: message,
         branch: this.baseBranch,
-        committedBy: 'Michel Casilla',
         avatar: '',
         changes
       });
@@ -62,11 +55,12 @@ export class HtmlChangeDetector {
     }
   }
 
-  public async processDiffFile(filePath: string, slackChannel: string): Promise<void> {
+  public async processDiffFile(filePath: string): Promise<void> {
     const diffText = this.readDiffFile(filePath);
     const matches = this.detectChanges(diffText);
     const message = this.createMessage(matches);
     logWithColor(message, 'green');
-    await this.sendMessageToSlack(slackChannel, message, matches);
+    logWithColor(matches.join(' | '), 'green');
+    await this.sendMessageToSlack(message, matches);
   }
 }

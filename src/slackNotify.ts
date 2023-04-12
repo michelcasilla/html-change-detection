@@ -8,15 +8,15 @@ export class SlackNotification{
 	constructor(hook_url: string, channel: string, username?: string){
 		this.hook_url = hook_url;
 		this.channel = channel;
-		this.username = username;
+		this.username = username || 'GitHubAction';
 		this.slack = SlackNotify(this.hook_url);
 	}
 
-	async send(params = {text: '', branch: '', committedBy: '', avatar: '', changes: [], channelConf : { unfUrlLinks: 1}}){
+	async send(params = {text: '', branch: '', avatar: '', changes: [], channelConf : { unfUrlLinks: 1}}){
 		const attachments = [
 			{
-				"pretext": `PullRequest ${params.branch} from ${params.committedBy} may have impact on Auto_Testing`,
-				"title": `${params.committedBy} - ${params.branch}`,
+				"pretext": `PullRequest ${params.branch} from ${this.username} may have impact on Auto_Testing`,
+				"title": `${this.username} - ${params.branch}`,
 				"fields": params.changes.map(change => {
 					return {
 						"Change": 'Attribute Changed',
@@ -30,7 +30,6 @@ export class SlackNotification{
 		const {text, avatar} = params;
 		
 		const channel = `#${this.channel}`;
-		const username = this.username || 'GitHubAction';
 		const unfurl_links = params?.channelConf?.unfUrlLinks || 1;
 		return await this.slack.send({ 
 			channel, 
@@ -38,7 +37,7 @@ export class SlackNotification{
 			attachments,
 			text, 
 			unfurl_links, 
-			username 
+			username : this.username 
 		});
 	}
 }
