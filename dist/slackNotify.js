@@ -26,16 +26,18 @@ class SlackNotification {
         return __awaiter(this, void 0, void 0, function* () {
             const attachments = [
                 {
-                    "pretext": `Pull request ${params.branchUrl} from https://github.com/${this.username} may have impact on Auto_Testing`,
-                    "title": `${this.username} - ${params.branch}`,
+                    "pretext": `Pull request *${params.branchUrl}* from *https://github.com/${this.username}* may have impact on *Auto_Testing*`,
+                    "title": `Changes made by *${this.username}* on *${params.branch}* to file *filename*`,
                     "fields": params.changes.map(change => {
+                        const color = String(change).charAt(0) === "-" ? '#D22B2B' : '#00ff00';
                         return {
                             "Change": 'Attribute Changed',
                             "value": change,
-                            "short": true
+                            "short": false,
+                            "color": color
                         };
                     }),
-                    "color": "#00ff00"
+                    "color": '#00ff00'
                 }
             ];
             const { text, avatar } = params;
