@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HtmlChangeDetector = void 0;
 const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const logger_1 = require("./logger");
 const slackNotify_1 = require("./slackNotify");
 class HtmlChangeDetector {
@@ -81,7 +82,7 @@ class HtmlChangeDetector {
         }
         return message;
     }
-    sendMessageToSlack(message, changes = []) {
+    sendMessageToSlack(message, changes = [], usage) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.notifier.send({
@@ -90,6 +91,7 @@ class HtmlChangeDetector {
                     branchUrl: this.branchUrl,
                     avatar: "",
                     changes,
+                    usage
                 });
             }
             catch (error) {
@@ -97,15 +99,42 @@ class HtmlChangeDetector {
             }
         });
     }
+    findMatchingFilesInDirectory(directory, searchTerms) {
+        const foundMatches = [];
+        function searchFilesRecursively(currentPath) {
+            if (!fs.existsSync(currentPath)) {
+                console.error(`Directory not found: ${currentPath}`);
+                return;
+            }
+            const entries = fs.readdirSync(currentPath, { withFileTypes: true });
+            for (const entry of entries) {
+                const fullPath = path.join(currentPath, entry.name);
+                if (entry.isDirectory()) {
+                    searchFilesRecursively(fullPath);
+                }
+                else if (entry.isFile() && path.extname(entry.name) === '.ts') {
+                    const fileContent = fs.readFileSync(fullPath, 'utf-8');
+                    for (const searchTerm of searchTerms) {
+                        if (fileContent.includes(searchTerm)) {
+                            foundMatches.push({ file: fullPath, match: searchTerm });
+                        }
+                    }
+                }
+            }
+        }
+        searchFilesRecursively(directory);
+        return foundMatches;
+    }
     processDiffFile(filePath) {
         return __awaiter(this, void 0, void 0, function* () {
             const diffText = this.readDiffFile(filePath);
             const matches = this.detectChanges(diffText);
             const message = this.createMessage(matches);
+            const usage = this.findMatchingFilesInDirectory(process.env.AUTO_TESTING_PATH, matches);
             if (message) {
                 (0, logger_1.logWithColor)(message, "green");
                 (0, logger_1.logWithColor)(matches.join(" | "), "green");
-                yield this.sendMessageToSlack(message, matches);
+                yield this.sendMessageToSlack(message, matches, usage);
             }
         });
     }

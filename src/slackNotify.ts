@@ -12,7 +12,7 @@ export class SlackNotification{
 		this.slack = SlackNotify(this.hook_url);
 	}
 
-	async send(params = {text: '', branch: '', branchUrl: '', avatar: '', changes: [], channelConf : { unfUrlLinks: 1}}){
+	async send(params = {text: '', branch: '', branchUrl: '', avatar: '', changes: [], channelConf : { unfUrlLinks: 1}, usage: []}){
 		const attachments = this.getHTMLNotificationAttachments(params)
 		const {text, avatar} = params;
 		
@@ -28,9 +28,13 @@ export class SlackNotification{
 		});
 	}
 
-	private getHTMLNotificationAttachments(params: { text: string; branch: string; branchUrl: string; avatar: string; changes: any[]; channelConf: { unfUrlLinks: number; }; }) {
+	private getHTMLNotificationAttachments(params: { text: string; branch: string; branchUrl: string; avatar: string; changes: any[]; channelConf: { unfUrlLinks: number; }, usage: any}) {
 		const t = params.changes.length;
-		const severity = t > 20 ? 'MEDIUM' : t > 500 ? 'HIGHT' : 'LOW';
+		const isBeingUsed = (params?.usage || []).length;
+		let severity = t > 20 ? 'MEDIUM' : t > 500 ? 'HIGHT' : 'LOW';
+		if(isBeingUsed){
+			severity = 'HIGHT';
+		}
 		const attachments = [
 			{
 				"pretext": `Pull request *${params.branchUrl}* from *https://github.com/${this.username}* may have impact on *Auto_Testing*`,

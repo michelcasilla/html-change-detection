@@ -68,7 +68,8 @@ export class HtmlChangeDetector {
 
   public async sendMessageToSlack(
     message: string,
-    changes = []
+    changes = [],
+    usage: any[]
   ): Promise<void> {
     try {
       await this.notifier.send({
@@ -77,20 +78,55 @@ export class HtmlChangeDetector {
         branchUrl: this.branchUrl,
         avatar: "",
         changes,
+        usage
       });
     } catch (error) {
       console.error("Error trying to send message to Slack:", error);
     }
   }
 
+  private findMatchingFilesInDirectory(directory: string, searchTerms: string[]) {
+    const foundMatches = [];
+  
+    function searchFilesRecursively(currentPath) {
+      if (!fs.existsSync(currentPath)) {
+        console.error(`Directory not found: ${currentPath}`);
+        return;
+      }
+  
+      const entries = fs.readdirSync(currentPath, { withFileTypes: true });
+  
+      for (const entry of entries) {
+        const fullPath = path.join(currentPath, entry.name);
+  
+        if (entry.isDirectory()) {
+          searchFilesRecursively(fullPath);
+        } else if (entry.isFile() && path.extname(entry.name) === '.ts') {
+          const fileContent = fs.readFileSync(fullPath, 'utf-8');
+  
+          for (const searchTerm of searchTerms) {
+            if (fileContent.includes(searchTerm)) {
+              foundMatches.push({ file: fullPath, match: searchTerm });
+            }
+          }
+        }
+      }
+    }
+  
+    searchFilesRecursively(directory);
+    return foundMatches;
+  }
+  
+
   public async processDiffFile(filePath: string): Promise<void> {
     const diffText = this.readDiffFile(filePath);
     const matches = this.detectChanges(diffText);
     const message = this.createMessage(matches);
+    const usage = this.findMatchingFilesInDirectory(process.env.AUTO_TESTING_PATH, matches);
     if(message){
       logWithColor(message, "green");
       logWithColor(matches.join(" | "), "green");
-      await this.sendMessageToSlack(message, matches);
+      await this.sendMessageToSlack(message, matches, usage);
     }
   }
 }
