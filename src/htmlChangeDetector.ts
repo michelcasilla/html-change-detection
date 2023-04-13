@@ -7,8 +7,7 @@ import { text } from "stream/consumers";
 
 export class HtmlChangeDetector {
   private webClient: WebClient;
-  private pattern =
-    /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
+  private pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|data-[a-zA-Z-]+\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
   private notifier;
   private baseBranch;
   private branchUrl;

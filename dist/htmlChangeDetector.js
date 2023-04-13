@@ -38,7 +38,7 @@ const logger_1 = require("./logger");
 const slackNotify_1 = require("./slackNotify");
 class HtmlChangeDetector {
     constructor(token, slackChannel, base, committedBy, branchUrl) {
-        this.pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
+        this.pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|data-[a-zA-Z-]+\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
         // this.webClient = new WebClient(token);
         this.baseBranch = base;
         this.branchUrl = branchUrl;
