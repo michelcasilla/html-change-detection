@@ -62,7 +62,7 @@ export class HtmlChangeDetector {
   private createMessage(matches: string[] | null): string {
     let message = "HTML changes detected";
     if (!matches) {
-      message = "No HTML changes detected";
+      message = "";
     }
     return message;
   }
@@ -88,8 +88,10 @@ export class HtmlChangeDetector {
     const diffText = this.readDiffFile(filePath);
     const matches = this.detectChanges(diffText);
     const message = this.createMessage(matches);
-    logWithColor(message, "green");
-    logWithColor(matches.join(" | "), "green");
-    await this.sendMessageToSlack(message, matches);
+    if(message){
+      logWithColor(message, "green");
+      logWithColor(matches.join(" | "), "green");
+      await this.sendMessageToSlack(message, matches);
+    }
   }
 }

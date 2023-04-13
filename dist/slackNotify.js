@@ -39,21 +39,20 @@ class SlackNotification {
         });
     }
     getHTMLNotificationAttachments(params) {
+        const t = params.changes.length;
+        const severity = t > 20 ? 'MEDIUM' : t > 500 ? 'HIGHT' : 'LOW';
         return [
             {
-                "pretext": `Pull request *[${[params.branch]}](${params.branchUrl})* from *[${this.username}](https://github.com/${this.username})* may have impact on *Auto_Testing*`,
-                "title": `Changes made by *${this.username}* on *${params.branch}* to file *filename*`,
+                "pretext": `Pull request *${params.branchUrl}* from *https://github.com/${this.username}* may have impact on *Auto_Testing*`,
+                "title": `Changes made by *${this.username}* on *${params.branch}* may have ${severity} impact on Auto_Testing`,
                 "fields": params.changes.map(change => {
-                    const color = String(change).charAt(0) === "-" ? '#D22B2B' : '#00ff00';
                     return {
                         "Change": 'Attribute Changed',
                         "value": change,
                         "short": false,
-                        "color": color,
                     };
                 }),
-                "color": '#00ff00',
-                "mrkdwn_in": ['title', 'pretext']
+                "color": '#00ff00'
             }
         ];
     }
