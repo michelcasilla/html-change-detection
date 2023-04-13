@@ -48,7 +48,7 @@ export class SlackNotification{
 		if(t > 10){
 			attachments[0].fields.push({
 				"Change": 'More',
-				"value": "...More",
+				"value": `...+ ${t-10} changes more`,
 				"short": false,
 			})
 		}
