@@ -1,17 +1,24 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { WebClient } from '@slack/web-api';
-import { logWithColor } from './logger';
-import { SlackNotification } from './slackNotify';
-import { text } from 'stream/consumers';
+import * as fs from "fs";
+import * as path from "path";
+import { WebClient } from "@slack/web-api";
+import { logWithColor } from "./logger";
+import { SlackNotification } from "./slackNotify";
+import { text } from "stream/consumers";
 
 export class HtmlChangeDetector {
   private webClient: WebClient;
-  private pattern = /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
+  private pattern =
+    /[-][<]?(?:.*?)(class\s*=\s*".*?"|id\s*=\s*".*?"|[a-zA-Z-]+\s*=\s*".*?")[>]?|[-]\s*<\/\w+>/g;
   private notifier;
   private baseBranch;
   private branchUrl;
-  constructor(token: string, slackChannel: string, base?: string, committedBy?: string, branchUrl?: string) {
+  constructor(
+    token: string,
+    slackChannel: string,
+    base?: string,
+    committedBy?: string,
+    branchUrl?: string
+  ) {
     // this.webClient = new WebClient(token);
     this.baseBranch = base;
     this.branchUrl = branchUrl;
@@ -19,42 +26,61 @@ export class HtmlChangeDetector {
   }
 
   private readDiffFile(filePath: string): string {
-    return fs.readFileSync(filePath, 'utf-8');
+    return fs.readFileSync(filePath, "utf-8");
   }
 
   private detectChanges(diffText: string): string[] | null {
+    const excludedList = [
+      "ngComponentOutlet",
+      "ngIf",
+      "ngFor",
+      "ngSwitch",
+      "ngClass",
+      "ngStyle",
+      "ngModel",
+      "ngModelGroup",
+      "ngForm",
+      "ngControl",
+      "ngControlStatus",
+      "ngSubmit",
+      "ngSelect",
+      "ngPlural",
+      "ngPluralCase",
+    ];
     const matches = diffText.match(this.pattern);
-    
     if (!matches) {
       return null;
     }
-  
-    const uniqueMatches = new Set(matches);
-    const matchedCleanedList = Array.from(uniqueMatches);
-  
+
+    const matchedCleanedList = matches.filter((match) => {
+      return !excludedList.some((excludedItem) => match.includes(excludedItem));
+    });
+
     return matchedCleanedList;
   }
-  
 
   private createMessage(matches: string[] | null): string {
-    let message = 'HTML changes detected';
+    let message = "HTML changes detected";
     if (!matches) {
-      message = 'No HTML changes detected';
+      message = "No HTML changes detected";
     }
     return message;
   }
 
-  public async sendMessageToSlack(message: string, changes = []): Promise<void> {
+  public async sendMessageToSlack(
+    message: string,
+    changes = []
+  ): Promise<void> {
     try {
       await this.notifier.send({
         text: message,
         branch: this.baseBranch,
         branchUrl: this.branchUrl,
-        avatar: '',
-        changes
+        avatar: "",
+        changes,
       });
     } catch (error) {
-      console.error('Error trying to send message to Slack:', error);
+      console.error("Error trying to send message to Slack:", error);
     }
   }
 
@@ -62,8 +88,8 @@ export class HtmlChangeDetector {
     const diffText = this.readDiffFile(filePath);
     const matches = this.detectChanges(diffText);
     const message = this.createMessage(matches);
-    logWithColor(message, 'green');
-    logWithColor(matches.join(' | '), 'green');
+    logWithColor(message, "green");
+    logWithColor(matches.join(" | "), "green");
     await this.sendMessageToSlack(message, matches);
   }
 }

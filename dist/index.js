@@ -37,14 +37,14 @@ const htmlChangeDetector_1 = require("./htmlChangeDetector");
 const validate_1 = require("./validate");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     (0, validate_1.validateEnv)([
-        'SLACK_CHANNEL',
-        'SLACK_BOT_TOKEN',
+        'HTML_SLACK_CHANNEL',
+        'HTML_SLACK_HOOK_URL',
         'COMMITTER',
         'BRANCH_URL'
     ]);
     const base = process.env.PR_BASE_REF;
-    const token = process.env.SLACK_BOT_TOKEN;
-    const slackChannel = process.env.SLACK_CHANNEL;
+    const token = process.env.HTML_SLACK_HOOK_URL;
+    const slackChannel = process.env.HTML_SLACK_CHANNEL;
     const committedBy = process.env.COMMITTER;
     const branchUrl = process.env.BRANCH_URL;
     // const atPath = process.env.AUTOMATE_TESTING_REPO_PATH;

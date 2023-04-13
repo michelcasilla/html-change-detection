@@ -45,21 +45,39 @@ class HtmlChangeDetector {
         this.notifier = new slackNotify_1.SlackNotification(token, slackChannel, committedBy);
     }
     readDiffFile(filePath) {
-        return fs.readFileSync(filePath, 'utf-8');
+        return fs.readFileSync(filePath, "utf-8");
     }
     detectChanges(diffText) {
+        const excludedList = [
+            "ngComponentOutlet",
+            "ngIf",
+            "ngFor",
+            "ngSwitch",
+            "ngClass",
+            "ngStyle",
+            "ngModel",
+            "ngModelGroup",
+            "ngForm",
+            "ngControl",
+            "ngControlStatus",
+            "ngSubmit",
+            "ngSelect",
+            "ngPlural",
+            "ngPluralCase",
+        ];
         const matches = diffText.match(this.pattern);
         if (!matches) {
             return null;
         }
-        const uniqueMatches = new Set(matches);
-        const matchedCleanedList = Array.from(uniqueMatches);
+        const matchedCleanedList = matches.filter((match) => {
+            return !excludedList.some((excludedItem) => match.includes(excludedItem));
+        });
         return matchedCleanedList;
     }
     createMessage(matches) {
-        let message = 'HTML changes detected';
+        let message = "HTML changes detected";
         if (!matches) {
-            message = 'No HTML changes detected';
+            message = "No HTML changes detected";
         }
         return message;
     }
@@ -70,12 +88,12 @@ class HtmlChangeDetector {
                     text: message,
                     branch: this.baseBranch,
                     branchUrl: this.branchUrl,
-                    avatar: '',
-                    changes
+                    avatar: "",
+                    changes,
                 });
             }
             catch (error) {
-                console.error('Error trying to send message to Slack:', error);
+                console.error("Error trying to send message to Slack:", error);
             }
         });
     }
@@ -84,8 +102,8 @@ class HtmlChangeDetector {
             const diffText = this.readDiffFile(filePath);
             const matches = this.detectChanges(diffText);
             const message = this.createMessage(matches);
-            (0, logger_1.logWithColor)(message, 'green');
-            (0, logger_1.logWithColor)(matches.join(' | '), 'green');
+            (0, logger_1.logWithColor)(message, "green");
+            (0, logger_1.logWithColor)(matches.join(" | "), "green");
             yield this.sendMessageToSlack(message, matches);
         });
     }
