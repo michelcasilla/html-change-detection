@@ -31,11 +31,11 @@ export class SlackNotification{
 	private getHTMLNotificationAttachments(params: { text: string; branch: string; branchUrl: string; avatar: string; changes: any[]; channelConf: { unfUrlLinks: number; }; }) {
 		const t = params.changes.length;
 		const severity = t > 20 ? 'MEDIUM' : t > 500 ? 'HIGHT' : 'LOW';
-		return [
+		const attachments = [
 			{
 				"pretext": `Pull request *${params.branchUrl}* from *https://github.com/${this.username}* may have impact on *Auto_Testing*`,
-				"title": `Changes made by *${this.username}* on *${params.branch}* may have ${severity} impact on Auto_Testing`,
-				"fields": params.changes.map(change => {
+				"title": `${t} changes detected made by *${this.username}* on *${params.branch}* may have ${severity} impact on Auto_Testing`,
+				"fields": (params.changes || []).slice(0,10).map(change => {
 					return {
 						"Change": 'Attribute Changed',
 						"value": change,
@@ -45,5 +45,13 @@ export class SlackNotification{
 				"color": '#00ff00'
 			}
 		];
+		if(t > 10){
+			attachments[0].fields.push({
+				"Change": 'More',
+				"value": "...More",
+				"short": false,
+			})
+		}
+		return attachments;
 	}
 }
